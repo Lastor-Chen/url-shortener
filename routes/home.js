@@ -5,9 +5,11 @@
 
 const express = require('express')
 const router = express.Router()
-const randomstring = require("randomstring")
+const randomstring = require('randomstring')
 const Link = require('../models/link.js')
 
+// custom module
+const { checkFormat, hasSSL } = require('../lib/urlChecker.js')
 
 // routes '/'
 // ==============================
@@ -17,8 +19,6 @@ router.get('/', (req, res) => res.render('index'))
 router.post('/', (req, res) => {
   console.log('input', req.body)
   const input = req.body.url
-
-  // 檢查 input
   if (!input) return res.render('index', { error: '不得為空' })
 
   // 生成短網址
@@ -27,13 +27,16 @@ router.post('/', (req, res) => {
   // save to database
   const newLink = new Link({
     short: short,
-    url: /^https?:\/\//.test(input) ? input.split('//')[1] : input,
-    ssl: /^https/.test(input)
+    url: checkFormat(input),
+    ssl: hasSSL(input)
   })
-  newLink.save()
 
-  console.log(newLink)
-  res.render('index', { short })
+  newLink.save()
+    .then(link => {
+      console.log(link)
+      res.render('index', { short })
+    })
+    .catch(err => res.status(422).json(err))
 })
 
 router.get('/:short', (req, res) => {
