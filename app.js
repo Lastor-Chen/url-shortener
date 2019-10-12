@@ -6,6 +6,8 @@
 // npm package
 const express = require('express')
 const exphbs = require('express-handlebars')
+const randomstring = require("randomstring")
+
 
 // 環境 setting
 // ==============================
@@ -23,6 +25,7 @@ const hbs = exphbs.create({
 app.engine('hbs', hbs.engine)
 app.set('view engine', 'hbs')
 
+
 // route 設定
 // ==============================
 
@@ -30,10 +33,6 @@ const link = {
   short: "",
   url: "",
   ssl: null
-}
-
-function getShorten(input) {
-  return "6y7Up"
 }
 
 app.get('/', (req, res) => res.render('index'))
@@ -48,7 +47,7 @@ app.post('/shorten', (req, res) => {
   if (!input) return res.render('index', { error: '不得為空' })
 
   // 生成短網址
-  const short = getShorten(input)
+  const short = randomstring.generate(5)
 
   // save to database
   link.short = short
@@ -70,6 +69,7 @@ app.get('/:short', (req, res) => {
   console.log('target', protocol + url)
   res.redirect(protocol + url)
 })
+
 
 // start server
 // ==============================
