@@ -36,17 +36,22 @@ router.post('/', (req, res) => {
   res.render('index', { short })
 })
 
-router.get('/links/:short', (req, res) => {
-  const short = req.params.url
+router.get('/:short', (req, res) => {
+  const short = req.params.short
+  console.log('short', short)
 
-  // Query
-  // Link.findOne({ short }, link => {...})
-  const protocol = link.ssl ? 'https://' : 'http://'
-  const url = link.url
-
-  console.log('target', protocol + url)
-  res.redirect(protocol + url)
+  Link.findOne({ short: short })
+    .then(link => {
+      const protocol = link.ssl ? 'https://' : 'http://'
+      const url = link.url
+      console.log('target', protocol + url)
+      res.redirect(protocol + url)
+    })
+    .catch(err => {
+      res.render('index', { error: `無效的短網址 => /${short}` })
+    })
 })
+
 
 // export
 // ==============================
