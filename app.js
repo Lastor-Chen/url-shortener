@@ -15,6 +15,7 @@ const app = express()
 app.set('port', process.env.PORT || 3000)
 
 app.use(express.urlencoded({ extended: true }))
+app.use(express.static('public'))
 
 // 設定模板引擎
 const hbs = exphbs.create({

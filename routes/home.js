@@ -19,7 +19,7 @@ router.get('/', (req, res) => res.render('index'))
 router.post('/', async (req, res) => {
   console.log('input', req.body)
   const input = req.body.url
-  if (!input) return res.render('index', { error: '不得為空' })
+  if (!input) return res.render('index', { error: 'Please provide a valid URL' })
 
   // 生成短網址
   let short = ''
@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
   newLink.save()
     .then(link => {
       console.log('save', link)
-      res.render('index', { short })
+      res.render('index', { short, input })
     })
     .catch(err => res.status(422).json(err))
 })
@@ -57,7 +57,7 @@ router.get('/:short', (req, res) => {
       res.redirect(protocol + url)
     })
     .catch(err => {
-      res.render('index', { error: `無效的短網址 => /${short}` })
+      res.render('index', { error: `"${short}" is not a valid short URL` })
     })
 })
 
