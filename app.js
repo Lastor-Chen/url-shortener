@@ -26,7 +26,17 @@ app.set('view engine', 'hbs')
 // route 設定
 // ==============================
 
-app.use('/', (req, res) => res.send('Server is running'))
+app.get('/', (req, res) => res.render('index', { layout: false }))
+
+app.post('/shorten', (req, res) => {
+  const shorten = req.body.url
+  res.render('index', { shorten, layout: false })
+})
+
+app.get('/:url', (req, res) => {
+  const url = req.params.url
+  res.redirect(`http://${url}`)
+})
 
 // start server
 // ==============================
