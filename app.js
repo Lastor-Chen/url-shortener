@@ -9,7 +9,7 @@ const exphbs = require('express-handlebars')
 const randomstring = require("randomstring")
 
 
-// 環境 setting
+// setting
 // ==============================
 
 const app = express()
@@ -25,15 +25,12 @@ const hbs = exphbs.create({
 app.engine('hbs', hbs.engine)
 app.set('view engine', 'hbs')
 
+// connect to mongoDB
+require('./models/index.js')()
 
-// route 設定
+
+// route
 // ==============================
-
-const link = {
-  short: "",
-  url: "",
-  ssl: null
-}
 
 app.get('/', (req, res) => res.render('index'))
 
@@ -76,7 +73,6 @@ app.get('/:short', (req, res) => {
 
 app.listen(app.get('port'), () => {
   const mode = process.env.NODE_ENV || 'development'
-
-  console.log(`Using environment "${mode}".`)
-  console.log(`App is running on "localhost:${app.get('port')}"`)
+  console.log(`\n[App] Using environment "${mode}".`)
+  console.log(`[App] App is running on "localhost:${app.get('port')}"`)
 })
