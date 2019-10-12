@@ -16,14 +16,20 @@ const { checkFormat, hasSSL } = require('../lib/urlChecker.js')
 
 router.get('/', (req, res) => res.render('index'))
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   console.log('input', req.body)
   const input = req.body.url
   if (!input) return res.render('index', { error: '不得為空' })
 
   // 生成短網址
-  const short = randomstring.generate(5)
-
+  let short = ''
+  while (true) {
+    short = randomstring.generate(5)
+    const isExist = await Link.findOne({ short: short }).exec()
+    console.log('loop', isExist)
+    if (!isExist) { break }
+  }
+  
   // save to database
   const newLink = new Link({
     short: short,
@@ -33,7 +39,7 @@ router.post('/', (req, res) => {
 
   newLink.save()
     .then(link => {
-      console.log(link)
+      console.log('save', link)
       res.render('index', { short })
     })
     .catch(err => res.status(422).json(err))
