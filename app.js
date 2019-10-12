@@ -6,7 +6,6 @@
 // npm package
 const express = require('express')
 const exphbs = require('express-handlebars')
-const randomstring = require("randomstring")
 
 
 // setting
@@ -32,40 +31,7 @@ require('./models/index.js')()
 // route
 // ==============================
 
-app.get('/', (req, res) => res.render('index'))
-
-app.get('/shorten', (req, res) => res.redirect('/'))
-
-app.post('/shorten', (req, res) => {
-  const input = req.body.url
-  console.log('input', input)
-  
-  // 檢查 input
-  if (!input) return res.render('index', { error: '不得為空' })
-
-  // 生成短網址
-  const short = randomstring.generate(5)
-
-  // save to database
-  link.short = short
-  link.url = /^https?:\/\//.test(input) ? input.split('//')[1] : input
-  link.ssl = /^https/.test(input)
-
-  console.log('link', link)
-  res.render('index', { short })
-})
-
-app.get('/:short', (req, res) => {
-  const short = req.params.url
-
-  // Query
-  // Link.findOne({ short }, link => {...})
-  const protocol = link.ssl ? 'https://' : 'http://'
-  const url = link.url
-
-  console.log('target', protocol + url)
-  res.redirect(protocol + url)
-})
+app.use('/', require('./routes/home.js'))
 
 
 // start server
