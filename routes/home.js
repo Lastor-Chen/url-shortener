@@ -15,8 +15,8 @@ const Link = require('../models/link.js')
 router.get('/', (req, res) => res.render('index'))
 
 router.post('/', (req, res) => {
+  console.log('input', req.body)
   const input = req.body.url
-  console.log('input', input)
 
   // 檢查 input
   if (!input) return res.render('index', { error: '不得為空' })
@@ -25,11 +25,14 @@ router.post('/', (req, res) => {
   const short = randomstring.generate(5)
 
   // save to database
-  link.short = short
-  link.url = /^https?:\/\//.test(input) ? input.split('//')[1] : input
-  link.ssl = /^https/.test(input)
+  const newLink = new Link({
+    short: short,
+    url: /^https?:\/\//.test(input) ? input.split('//')[1] : input,
+    ssl: /^https/.test(input)
+  })
+  newLink.save()
 
-  // console.log('link', link)
+  console.log(newLink)
   res.render('index', { short })
 })
 
