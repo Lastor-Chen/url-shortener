@@ -16,15 +16,20 @@
     <div class="container">
       <h1>URL Shortener</h1>
       <i class="fas fa-link"></i>
+      {{#if error}}
+        <div class="text-danger">{{error}}</div>
+      {{/if}}
       <form action="/shorten" method="POST">
         <input type="text" name="url">
         <button type="submit">Shorten!</button>
       </form>
 
-      <div>
-        <span>Link shortening successfully! Visit your website at</span>
-        <a href="/{{shorten}}">localhost:3000/{{shorten}}</a>
-      </div>
+      {{#if short}}
+        <div>
+          <span>Link shortening successfully! Visit your website at</span>
+          <a href="/{{short}}" target="_blank" rel="noopener">localhost:3000/{{short}}</a>
+        </div>
+      {{/if}}
     </div>
   </main>
 

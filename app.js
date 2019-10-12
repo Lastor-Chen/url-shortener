@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }))
 // 設定模板引擎
 const hbs = exphbs.create({
   extname: 'hbs', 
-  defaultLayout: 'main'
+  defaultLayout: false
 })
 app.engine('hbs', hbs.engine)
 app.set('view engine', 'hbs')
@@ -26,16 +26,49 @@ app.set('view engine', 'hbs')
 // route 設定
 // ==============================
 
-app.get('/', (req, res) => res.render('index', { layout: false }))
+const link = {
+  short: "",
+  url: "",
+  ssl: null
+}
+
+function getShorten(input) {
+  return "6y7Up"
+}
+
+app.get('/', (req, res) => res.render('index'))
+
+app.get('/shorten', (req, res) => res.redirect('/'))
 
 app.post('/shorten', (req, res) => {
-  const shorten = req.body.url
-  res.render('index', { shorten, layout: false })
+  const input = req.body.url
+  console.log('input', input)
+  
+  // 檢查 input
+  if (!input) return res.render('index', { error: '不得為空' })
+
+  // 生成短網址
+  const short = getShorten(input)
+
+  // save to database
+  link.short = short
+  link.url = /^https?:\/\//.test(input) ? input.split('//')[1] : input
+  link.ssl = /^https/.test(input)
+
+  console.log('link', link)
+  res.render('index', { short })
 })
 
-app.get('/:url', (req, res) => {
-  const url = req.params.url
-  res.redirect(`http://${url}`)
+app.get('/:short', (req, res) => {
+  const short = req.params.url
+
+  // Query
+  // Link.findOne({ short }, link => {...})
+  const protocol = link.ssl ? 'https://' : 'http://'
+  const url = link.url
+
+  console.log('target', protocol + url)
+  res.redirect(protocol + url)
 })
 
 // start server
@@ -43,11 +76,7 @@ app.get('/:url', (req, res) => {
 
 app.listen(app.get('port'), () => {
   const mode = process.env.NODE_ENV || 'development'
+
   console.log(`Using environment "${mode}".`)
-  console.log(
-    'Node.js Server with Express is running.',
-    '\033[33m',
-    `=> http://localhost:${app.get('port')}`,
-    '\033[0m'
-  )
+  console.log(`App is running on "localhost:${app.get('port')}"`)
 })
