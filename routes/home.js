@@ -46,18 +46,14 @@ router.post('/', async (req, res) => {
 
 router.get('/:short', (req, res) => {
   const short = req.params.short
-  console.log('short', short)
 
   Link.findOne({ short: short })
     .then(link => {
       const protocol = link.ssl ? 'https://' : 'http://'
       const url = link.url
-      console.log('target', protocol + url)
       res.redirect(protocol + url)
     })
-    .catch(err => {
-      res.render('index', { error: `"${short}" is not a valid short URL` })
-    })
+    .catch(err => res.render('index', { error: `"${short}" is not a valid short URL` }))
 })
 
 
