@@ -7,7 +7,7 @@ Database used MongoDB.
 Alpha Camp 學期三期末考 A29-Q4。 <br>
 
 ## Preview Pages
-<img src="./public/img/preview01.jpg" alt="preview" width="500px" target="_blank">
+<img src="./public/img/preview.jpg" alt="preview" width="500px" target="_blank">
 
 #### 功能
 * 於表單中輸入網址後，可生成短網址
