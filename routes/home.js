@@ -14,6 +14,9 @@ const { checkFormat, hasSSL } = require('../lib/urlChecker.js')
 // routes '/'
 // ==============================
 
+// prevent browser default request /favicon.ico
+router.get('/favicon.ico', (req, res) => res.status(204))
+
 router.get('/', (req, res) => res.render('index'))
 
 router.post('/', async (req, res) => {
