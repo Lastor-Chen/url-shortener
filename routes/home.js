@@ -21,19 +21,26 @@ router.post('/', async (req, res) => {
   const input = req.body.url
   if (!input) return res.render('index', { error: 'Please provide a valid URL' })
 
+  // 確認 url 是否已存在
+  const url = checkFormat(input)
+  const resURL = await Link.findOne({ url: url }).exec()
+  console.log('query url', resURL)
+  if (resURL) return res.render('index', { short: resURL.short, input })
+
   // 生成短網址
   let short = ''
   while (true) {
     short = randomstring.generate(5)
     const isExist = await Link.findOne({ short: short }).exec()
-    console.log('loop', isExist)
+    console.log('short', short)
+    console.log('query short', isExist)
     if (!isExist) { break }
   }
   
   // save to database
   const newLink = new Link({
     short: short,
-    url: checkFormat(input),
+    url: url,
     ssl: hasSSL(input)
   })
 
