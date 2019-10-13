@@ -20,38 +20,27 @@ router.get('/favicon.ico', (req, res) => res.status(204))
 router.get('/', (req, res) => res.render('index'))
 
 router.post('/', async (req, res) => {
-  console.log('input', req.body)
   const input = req.body.url
   if (!input) return res.render('index', { error: 'Please provide a valid URL' })
 
-  // 確認 url 是否已存在
   const url = checkFormat(input)
-  const resURL = await Link.findOne({ url: url }).exec()
-  console.log('query url', resURL)
+  let short = randomstring.generate(5)
+  let links = []
+  try { links = await Link.find({ $or: [{ short: short }, { url: url }] }).limit(2).exec() }
+  catch (err) { console.error(err) }
+  
+  // 確認 url 是否已存在
+  const resURL = links.find(link => link.url === url)
   if (resURL) return res.render('index', { short: resURL.short, input })
-
-  // 生成短網址
-  let short = ''
-  while (true) {
+  
+  // 確認 short 是否已存在
+  while ( links.some(link => link.short === short) ) {
     short = randomstring.generate(5)
-    const isExist = await Link.findOne({ short: short }).exec()
-    console.log('short', short)
-    console.log('query short', isExist)
-    if (!isExist) { break }
   }
   
   // save to database
-  const newLink = new Link({
-    short: short,
-    url: url,
-    ssl: hasSSL(input)
-  })
-
-  newLink.save()
-    .then(link => {
-      console.log('save', link)
-      res.render('index', { short, input })
-    })
+  Link.create({ short: short, url: url, ssl: hasSSL(input) })
+    .then(link => res.render('index', { short, input }))
     .catch(err => res.status(422).json(err))
 })
 
